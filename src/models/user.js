@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     min: 6,
     select: false,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
 });
 
 const userModel = mongoose.model('users', userSchema);

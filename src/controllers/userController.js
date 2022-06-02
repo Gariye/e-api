@@ -1,4 +1,5 @@
 const userModel = require('../models/user');
+const api = require('../apiFeatures/api');
 
 //CREATE USERS
 const createUser = async (req, res) => {
@@ -21,7 +22,23 @@ const createUser = async (req, res) => {
 // GET ALL USERS
 const getAllUsers = async (req, res) => {
   try {
-    const user = await userModel.find({});
+    // const queryObj = { ...req.query };
+    // const exclueded = ['page', 'sort', 'limit', 'feild'];
+    // exclueded.forEach((el) => delete queryObj[el]);
+
+    // let queryStr = JSON.stringify(queryObj).replace(
+    //   /(gte|gt|lt|lte)/g,
+    //   (match) => `$${match}`,
+    // );
+
+    // let query = userModel.find(JSON.parse(queryStr));
+    const users = new api(userModel.find(), req.query)
+      .filter()
+      .sort()
+      .field()
+      .paginate();
+    const user = await users.query;
+
     res.status(200).json({
       status: 'success',
       results: user.length,
