@@ -35,4 +35,79 @@ const getAllUsers = async (req, res) => {
   }
 };
 
-module.exports = { getAllUsers, createUser };
+//READ ONE USER OR DOCUMENT
+const GetUser = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await userModel.findById(id);
+    if (!user) {
+      throw new Error('enable to read this document');
+    }
+
+    res.json({
+      status: 'success',
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    res.json({
+      status: 'error',
+      error: error.message,
+    });
+  }
+};
+
+//DELETE USER
+const deleteUser = async (req, res) => {
+  const id = req.params.id;
+  try {
+    const user = await userModel.findByIdAndDelete(id);
+    if (!user) {
+      throw new Error('enable to delete this user');
+    }
+
+    res.json({
+      status: 'success',
+      message: 'woow, you success fully deleted this user',
+    });
+  } catch (error) {
+    res.json({
+      status: 'error',
+      error: error.message,
+    });
+  }
+};
+
+//UPDATE USER
+const updateUser = async (req, res) => {
+  const id = req.params.id;
+
+  //UPDATE VALIDATION
+  const updates = Object.keys(req.body);
+  const availbeUpdates = ['name', 'email', 'password'];
+  const isValidUpdate = updates.every((el) => availbeUpdates.includes(el) === true);
+
+  try {
+    if (!isValidUpdate) {
+      throw new Error('enable to update this feild');
+    }
+
+    const user = await userModel.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true,
+    });
+    res.json({
+      status: 'success',
+      data: {
+        user,
+      },
+    });
+  } catch (error) {
+    res.json({
+      status: 'error',
+      message: error.message,
+    });
+  }
+};
+module.exports = { getAllUsers, createUser, GetUser, deleteUser, updateUser };
