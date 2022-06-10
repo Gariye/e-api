@@ -4,8 +4,7 @@ const api = require('../apiFeatures/api');
 //CREATE USERS
 const createUser = async (req, res) => {
   try {
-    const newUser = new userModel(req.body);
-    await newUser.save();
+    const newUser = await userModel.create(req.body);
 
     res.json({
       status: 'success',
