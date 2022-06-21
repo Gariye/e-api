@@ -21,16 +21,6 @@ const createUser = async (req, res) => {
 // GET ALL USERS
 const getAllUsers = async (req, res) => {
   try {
-    // const queryObj = { ...req.query };
-    // const exclueded = ['page', 'sort', 'limit', 'feild'];
-    // exclueded.forEach((el) => delete queryObj[el]);
-
-    // let queryStr = JSON.stringify(queryObj).replace(
-    //   /(gte|gt|lt|lte)/g,
-    //   (match) => `$${match}`,
-    // );
-
-    // let query = userModel.find(JSON.parse(queryStr));
     const users = new api(userModel.find(), req.query)
       .filter()
       .sort()
