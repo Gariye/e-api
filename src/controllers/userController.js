@@ -1,119 +1,79 @@
 const userModel = require('../models/user');
 const api = require('../apiFeatures/api');
+const { catchAsync, appError } = require('../apiFeatures/appError');
 
 //CREATE USERS
-const createUser = async (req, res) => {
-  try {
-    const newUser = await userModel.create(req.body);
+const createUser = catchAsync(async (req, res, next) => {
+  const { name, email, password, comfirmPassword } = req.body;
+  const newUser = await userModel.create({ name, email, password, comfirmPassword });
 
-    res.json({
-      status: 'success',
-      newUser,
-    });
-  } catch (error) {
-    res.json({
-      status: 'error',
-      error: error.message,
-    });
-  }
-};
+  res.json({
+    status: 'success',
+    newUser,
+  });
+});
 
 // GET ALL USERS
-const getAllUsers = async (req, res) => {
-  try {
-    const users = new api(userModel.find(), req.query)
-      .filter()
-      .sort()
-      .field()
-      .paginate();
-    const user = await users.query;
+const getAllUsers = catchAsync(async (req, res) => {
+  const users = new api(userModel.find(), req.query)
+    .filter()
+    .sort()
+    .field()
+    .paginate();
+  const user = await users.query;
 
-    res.status(200).json({
-      status: 'success',
-      results: user.length,
-      data: user,
-    });
-  } catch (error) {
-    res.status(400).json({
-      status: 'error',
-      error: error.message,
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    results: user.length,
+    data: user,
+  });
+});
 
 //READ ONE USER OR DOCUMENT
-const GetUser = async (req, res) => {
+const GetUser = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  try {
-    const user = await userModel.findById(id);
-    if (!user) {
-      throw new Error('enable to read this document');
-    }
+  const user = await userModel.findById(id);
 
-    res.json({
-      status: 'success',
-      data: {
-        user,
-      },
-    });
-  } catch (error) {
-    res.json({
-      status: 'error',
-      error: error.message,
-    });
+  if (!user) {
+    return next(new appError('enable to read this document', 404));
   }
-};
+
+  res.json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
 
 //DELETE USER
-const deleteUser = async (req, res) => {
+const deleteUser = catchAsync(async (req, res, next) => {
   const id = req.params.id;
-  try {
-    const user = await userModel.findByIdAndDelete(id);
-    if (!user) {
-      throw new Error('enable to delete this user');
-    }
+  const user = await userModel.findByIdAndDelete(id);
 
-    res.json({
-      status: 'success',
-      message: 'woow, you success fully deleted this user',
-    });
-  } catch (error) {
-    res.json({
-      status: 'error',
-      error: error.message,
-    });
+  if (!user) {
+    return next(new appError('enable to read this document', 404));
   }
-};
+
+  res.json({
+    status: 'success',
+    message: 'woow, you success fully deleted this user',
+  });
+});
 
 //UPDATE USER
-const updateUser = async (req, res) => {
+const updateUser = catchAsync(async (req, res) => {
   const id = req.params.id;
 
-  //UPDATE VALIDATION
-  const updates = Object.keys(req.body);
-  const availbeUpdates = ['name', 'email', 'password'];
-  const isValidUpdate = updates.every((el) => availbeUpdates.includes(el) === true);
-
-  try {
-    if (!isValidUpdate) {
-      throw new Error('enable to update this feild');
-    }
-
-    const user = await userModel.findByIdAndUpdate(id, req.body, {
-      new: true,
-      runValidators: true,
-    });
-    res.json({
-      status: 'success',
-      data: {
-        user,
-      },
-    });
-  } catch (error) {
-    res.json({
-      status: 'error',
-      message: error.message,
-    });
-  }
-};
+  const user = await userModel.findByIdAndUpdate(id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+  res.json({
+    status: 'success',
+    data: {
+      user,
+    },
+  });
+});
 module.exports = { getAllUsers, createUser, GetUser, deleteUser, updateUser };

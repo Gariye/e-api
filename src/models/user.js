@@ -5,14 +5,13 @@ const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      unique: [true, 'this name is already exist please choose another name'],
       required: [true, 'name must have a value'],
       min: 6,
     },
     email: {
       type: String,
+      unique: [true, 'this name is already exist please choose another name'],
       required: [true, 'user must have a user name'],
-      unique: [true, 'this email is already in use'],
     },
     password: {
       type: String,
@@ -38,8 +37,8 @@ const userSchema = new mongoose.Schema(
 userSchema.pre('save', async function () {
   const user = this;
 
-  this.password = await bcrypt.hash(this.password, 12);
-  this.comfirmPassword = undefined;
+  user.password = await bcrypt.hash(user.password, 12);
+  user.comfirmPassword = undefined;
 });
 
 userSchema.pre('find', async function () {
