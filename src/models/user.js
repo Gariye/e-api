@@ -1,44 +1,41 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-const userSchema = new mongoose.Schema(
-  {
-    name: {
-      type: String,
-      required: [true, 'name must have a value'],
-      min: 6,
-    },
-    email: {
-      type: String,
-      unique: [true, 'this name is already exist please choose another name'],
-      required: [true, 'user must have a user name'],
-    },
-    password: {
-      type: String,
-      required: [true, 'user must have a password'],
-      min: 6,
-    },
-    comfirmPassword: {
-      type: String,
-      required: [true, 'user must have a comfirmation password'],
-      min: 6,
+const userSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'name must have a value'],
+    min: 6,
+  },
+  email: {
+    type: String,
+    unique: [true, 'this name is already exist please choose another name'],
+    required: [true, 'user must have a user name'],
+  },
+  password: {
+    type: String,
+    required: [true, 'user must have a password'],
+    min: 6,
+  },
+  comfirmPassword: {
+    type: String,
+    required: [true, 'user must have a comfirmation password'],
+    min: 6,
 
-      validate: {
-        validator: function (el) {
-          return el === this.password;
-        },
-        message: 'password did not match',
+    validate: {
+      validator: function (el) {
+        return el === this.password;
       },
+      message: 'password did not match',
     },
   },
-  { timestamps: true },
-);
+});
 
 userSchema.pre('save', async function () {
   const user = this;
 
-  user.password = await bcrypt.hash(user.password, 12);
-  user.comfirmPassword = undefined;
+  // user.password = await bcrypt.hash(user.password, 12);
+  // user.comfirmPassword = undefined;
 });
 
 userSchema.pre('find', async function () {
