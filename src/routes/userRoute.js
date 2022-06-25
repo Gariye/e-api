@@ -3,6 +3,7 @@ const userControllers = require('../controllers/userController');
 const auth = require('../controllers/auth');
 
 userRoute.route('/singup').post(auth.singup);
+userRoute.route('/login').post(auth.login);
 userRoute
   .route('/')
   .get(userControllers.getAllUsers)
