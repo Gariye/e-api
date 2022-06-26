@@ -8,7 +8,10 @@ server.use(express.json());
 
 // importing costom routes
 const userRoute = require('./src/routes/userRoute');
+const productRoute = require('./src/routes/product');
+
 server.use('/api/v1/users', userRoute);
+server.use('/api/v1/products', productRoute);
 
 //connecting database
 const database = process.env.SERVER;
