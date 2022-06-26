@@ -34,7 +34,20 @@ exports.getProducts = catchAsync(async (req, res, next) => {
 });
 
 //get one
-exports.getProduct = async () => {};
+exports.getProduct = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const products = await productModel.findById(id);
+
+  if (!products) {
+    return next(new appError('no products found', 400));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    resulst: products.length,
+    products,
+  });
+});
 
 //update
 exports.updateProduct = async () => {};
