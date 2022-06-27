@@ -3,13 +3,20 @@ const { catchAsync, appError } = require('../apiFeatures/appError');
 
 //create
 exports.createProduct = catchAsync(async (req, res, next) => {
-  const { productName, productDescription, productPrice, productImage } = req.body;
+  const {
+    productName,
+    productDescription,
+    productPrice,
+    productImage,
+    productCategory,
+  } = req.body;
 
   const product = await productModel.create({
     productName,
     productDescription,
     productPrice,
     productImage,
+    productCategory,
   });
   res.status(200).json({
     status: 'success',
@@ -28,7 +35,7 @@ exports.getProducts = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: 'success',
-    resulst: products.length,
+    resulst: await productModel.countDocuments(),
     products,
   });
 });
@@ -50,10 +57,51 @@ exports.getProduct = catchAsync(async (req, res, next) => {
 });
 
 //update
-exports.updateProduct = async () => {};
+exports.updateProduct = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const updatedProduct = await productModel.findByIdAndUpdate(id, req.body, {
+    runValidators: true,
+  });
+
+  if (!updatedProduct) {
+    return next(new appError('enable to update', 401));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    updatedProduct,
+  });
+});
 
 //delete
-exports.deleteProduct = async () => {};
+exports.deleteProduct = catchAsync(async (req, res, next) => {
+  const id = req.params.id;
+  const deletedProduct = await productModel.findByIdAndDelete(id);
+
+  if (!deletedProduct) {
+    return next(new appError('enable to update', 401));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    deletedProduct,
+  });
+});
 
 //stats
-exports.getProductStats = async () => {};
+exports.getProductStats = catchAsync(async (req, res, next) => {
+  const productStats = await productModel.aggregate([
+    { $match: { productPrice: { $lte: 3 } } },
+    {
+      $group: {
+        _id: '$productCategory',
+        avPrice: { $sum: '$productPrice' },
+      },
+    },
+  ]);
+
+  res.status(200).json({
+    status: 'success',
+    productStats,
+  });
+});
