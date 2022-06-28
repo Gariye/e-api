@@ -91,11 +91,12 @@ exports.deleteProduct = catchAsync(async (req, res, next) => {
 //stats
 exports.getProductStats = catchAsync(async (req, res, next) => {
   const productStats = await productModel.aggregate([
-    { $match: { productPrice: { $lte: 3 } } },
+    { $match: { productPrice: { $gte: 3 } } },
     {
       $group: {
         _id: '$productCategory',
         avPrice: { $sum: '$productPrice' },
+        products: { $push: '$productName' },
       },
     },
   ]);
