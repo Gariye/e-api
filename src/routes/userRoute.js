@@ -4,6 +4,10 @@ const auth = require('../controllers/auth');
 
 userRoute.route('/singup').post(auth.singup);
 userRoute.route('/login').post(auth.login);
+
+userRoute.route('/forgetPassword').post(auth.forgetPassword);
+userRoute.route('/resetPassword').post(auth.resetPassword);
+
 userRoute
   .route('/')
   .get(userControllers.getAllUsers)

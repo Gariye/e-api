@@ -92,4 +92,29 @@ const restrictTo = (...roles) => {
   };
 };
 
-module.exports = { singup, login, protect, restrictTo };
+const forgetPassword = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  // 1) Find user by email and verifiy is that user exist or not
+  const user = await userModel.findOne({ email });
+  if (!user) {
+    return next(
+      new appError('this user is not in our database please try one more', 401),
+    );
+  }
+
+  // 2) Generate Random Token
+  jwt.sign();
+  // 3) Send it to the users email
+});
+
+const resetPassword = () => {};
+
+module.exports = {
+  singup,
+  login,
+  protect,
+  restrictTo,
+  resetPassword,
+  forgetPassword,
+};
