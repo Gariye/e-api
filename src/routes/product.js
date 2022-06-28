@@ -15,7 +15,11 @@ productRoute
 productRoute
   .route('/:id')
   .get(products.getProduct)
-  .patch(products.updateProduct)
-  .delete(products.deleteProduct);
+  .patch(auth.protect, products.updateProduct)
+  .delete(
+    auth.protect,
+    auth.restrictTo('admin', 'super-admin'),
+    products.deleteProduct,
+  );
 
 module.exports = productRoute;

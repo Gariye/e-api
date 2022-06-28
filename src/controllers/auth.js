@@ -10,13 +10,14 @@ const tokenFN = (id) => {
 const singup = catchAsync(async (req, res, next) => {
   //body
 
-  const { name, email, password, comfirmPassword, passwordChange } = req.body;
+  const { name, email, password, comfirmPassword, passwordChange, role } = req.body;
   const user = await userModel.create({
     name,
     email,
     password,
     comfirmPassword,
     passwordChange,
+    role,
   });
 
   const token = tokenFN(user._id);
@@ -79,4 +80,16 @@ const protect = catchAsync(async (req, res, next) => {
   next();
 });
 
-module.exports = { singup, login, protect };
+const restrictTo = (...roles) => {
+  // role is an array
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new appError('you do not have a permission to do this action', 403),
+      );
+    }
+    next();
+  };
+};
+
+module.exports = { singup, login, protect, restrictTo };

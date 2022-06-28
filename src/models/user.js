@@ -13,7 +13,11 @@ const userSchema = new mongoose.Schema(
       unique: [true, 'this name is already exist please choose another name'],
       required: [true, 'user must have a user name'],
     },
-
+    role: {
+      type: String,
+      enum: ['user', 'admin', 'super-admin'],
+      default: 'user',
+    },
     password: {
       type: String,
       required: [true, 'user must have a password'],
