@@ -33,13 +33,13 @@ const userSchema = new mongoose.Schema(
         message: 'password did not match',
       },
     },
+    passwordChange: Date,
   },
   { timestamps: true },
 );
 
 userSchema.pre('save', async function () {
   const user = this;
-
   user.password = await bcrypt.hash(user.password, 12);
   user.comfirmPassword = undefined;
 });
@@ -50,6 +50,14 @@ userSchema.methods.correctPassword = async function (
   userPassword,
 ) {
   return await bcrypt.compare(candidatePassword, userPassword);
+};
+
+// check user changed password after
+userSchema.methods.changePasswordAfter = function (JWTtimestamps) {
+  if (this.passwordChange) {
+    const changedTime = parseInt(this.passwordChange.getTime() / 1000, 10);
+    return JWTtimestamps < changedTime;
+  }
 };
 
 userSchema.pre('find', async function () {
